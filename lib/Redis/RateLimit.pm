@@ -346,6 +346,15 @@ __END__
 
 =pod
 
+=begin :buttons
+
+=for html
+<a
+href="https://travis-ci.org/semifor/Redis-RateLimit"><img src="https://travis-ci.org/semifor/Redis-RateLimit.svg?branch=master"
+alt="Build Status" /></a>
+
+=end :buttons
+
 =head1 SYNOPSIS
 
     use Redis;

@@ -58,6 +58,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/semifor/Redis-RateLimit/issues"
+      },
+      "homepage" : "https://github.com/semifor/Redis-RateLimit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/semifor/Redis-RateLimit.git",
+         "web" : "https://github.com/semifor/Redis-RateLimit"
+      }
+   },
    "version" : "0.0001",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }

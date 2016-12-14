@@ -2,6 +2,12 @@
 
 Redis::RateLimit - Sliding window rate limiting with Redis
 
+<div>
+    <a
+    href="https://travis-ci.org/semifor/Redis-RateLimit"><img src="https://travis-ci.org/semifor/Redis-RateLimit.svg?branch=master"
+    alt="Build Status" /></a>
+</div>
+
 # VERSION
 
 version 0.0001
