@@ -83,7 +83,7 @@ sub _DENIED_NUMS { (1, 2) }
 sub _read_lua {
     my ( $self, $filename ) = @_;
 
-    my $path = dist_file(__PACKAGE__, "$filename.lua");
+    my $path = dist_file('Redis-RateLimit', "$filename.lua");
     read_file($path, binmode => ':utf8');
 }
 
