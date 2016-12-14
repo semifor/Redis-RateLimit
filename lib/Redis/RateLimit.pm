@@ -10,7 +10,7 @@ use File::Slurp::Tiny qw/read_file/;
 use JSON::MaybeXS;
 use List::Util qw/any max min/;
 use Redis;
-use Redis::ScriptCache;
+use Try::Tiny;
 use namespace::clean;
 
 =attr redis
@@ -23,7 +23,9 @@ has redis => (
     is       => 'ro',
     lazy     => 1,
     default  => sub { Redis->new },
-    handles => { map +( "redis_$_" => $_ ), qw/hget keys sadd srem/ },
+    handles => { map +( "redis_$_" => $_ ), qw/
+        eval evalsha hget keys sadd srem
+    / },
 );
 
 =attr prefix
@@ -75,6 +77,23 @@ around BUILDARGS => sub {
     return $args;
 };
 
+has _script_cache => (
+    is => 'lazy',
+);
+
+sub _build__script_cache {
+    my $self = shift;
+
+    # cache scripts: { name => [ hash, script ], ... }
+    my %cache =(
+        check_rate_limit => [ $self->_check_limit_script ],
+        check_limit_incr => [ $self->_check_limit_incr_script ],
+    );
+    unshift @$_, sha1_hex($$_[0]) for values %cache;
+
+    return \%cache;
+}
+
 # Note: 1 is returned for a normal rate limited action, 2 is returned for a
 # blacklisted action. Must sync with return codes in lua/check_limit.lua
 sub _DENIED_NUMS { (1, 2) }
@@ -86,7 +105,7 @@ sub _read_lua {
     read_file($path, binmode => ':utf8');
 }
 
-sub  _check_limit_script {
+sub _check_limit_script {
     my $self = shift;
 
     join("\n", map(
@@ -99,7 +118,7 @@ sub  _check_limit_script {
     );
 }
 
-sub  _check_limit_incr_script {
+sub _check_limit_incr_script {
     my $self = shift;
 
     join("\n", map(
@@ -112,33 +131,18 @@ sub  _check_limit_incr_script {
     );
 }
 
-has _script_cache => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build__script_cache',
-    handles => {
-        exec => 'run_script',
-    },
-);
+sub _exec {
+    my ( $self, $name, @params ) = @_;
 
-sub _build__script_cache {
-    my $self = shift;
-
-    my $cache = Redis::ScriptCache->new(redis_conn => $self->redis);
-    $cache->register_script(check_rate_limit => $self->_check_limit_script);
-    $cache->register_script(check_limit_incr => $self->_check_limit_incr_script);
-
-    return $cache;
+    my ( $hash, $script ) = @{ $self->_script_cache->{$name} };
+    try {
+        $self->redis_evalsha($hash, @params);
+    }
+    catch {
+        croak $_ unless /NOSCRIPT/;
+        $self->redis_eval($script, @params);
+    };
 }
-
-# transform exec arguments to the from expected by Redis::ScriptCache
-around exec => sub {
-    my ( $next, $self, $name, $keys, $args ) = @_;
-    my @keys = @{ $keys // [] };
-    my @args = @{ $args // [] };
-
-    $self->$next($name, [ 0+@keys, @keys, @args ]);
-};
 
 has _json_encoder => (
     is      => 'ro',
@@ -182,8 +186,8 @@ sub _script_args {
     my $rules = $self->json_encode($self->rules);
     $weight = max($weight, 1);
     return (
-        \@adjusted_keys,
-        [ $rules, time, $weight, $self->_whitelist_key, $self->_blacklist_key ],
+        0+@adjusted_keys, @adjusted_keys,
+        $rules, time, $weight, $self->_whitelist_key, $self->_blacklist_key,
     );
 }
 
@@ -197,9 +201,9 @@ sub check {
     my $self = shift;
     my $keys = ref $_[0] ? shift : \@_;
 
-    ( $keys, my $args ) = $self->_script_args($keys);
-
-    my $result = $self->exec(check_rate_limit => $keys, $args);
+    my $result = $self->_exec(
+        check_rate_limit => $self->_script_args($keys)
+    );
     return any { $result == $_ } _DENIED_NUMS;
 }
 
@@ -214,9 +218,9 @@ sub incr {
     my ( $self, $keys, $weight ) = @_;
     $keys = [ $keys ] unless ref $keys;
 
-    ( $keys, my $args ) = $self->_script_args($keys, $weight);
-
-    my $result = $self->exec(check_limit_incr => $keys, $args);
+    my $result = $self->_exec(
+        check_limit_incr => $self->_script_args($keys, $weight)
+    );
     return any { $result == $_ } _DENIED_NUMS;
 }
 
