@@ -10,7 +10,7 @@ use File::Slurp::Tiny qw/read_file/;
 use JSON::MaybeXS;
 use List::Util qw/any max min/;
 use Redis;
-use Redis::Evalsha;
+use Redis::ScriptCache;
 use namespace::clean;
 
 =attr redis
@@ -112,24 +112,33 @@ sub  _check_limit_incr_script {
     );
 }
 
-has _eval_sha => (
+has _script_cache => (
     is      => 'ro',
     lazy    => 1,
-    builder => '_build__eval_sha',
+    builder => '_build__script_cache',
     handles => {
-        exec => 'exec',
+        exec => 'run_script',
     },
 );
 
-sub _build__eval_sha {
+sub _build__script_cache {
     my $self = shift;
 
-    my $eval_sha = Redis::Evalsha->new(redis => $self->redis);
-    $eval_sha->add(check_rate_limit => $self->_check_limit_script);
-    $eval_sha->add(check_limit_incr => $self->_check_limit_incr_script);
+    my $cache = Redis::ScriptCache->new(redis_conn => $self->redis);
+    $cache->register_script(check_rate_limit => $self->_check_limit_script);
+    $cache->register_script(check_limit_incr => $self->_check_limit_incr_script);
 
-    return $eval_sha;
+    return $cache;
 }
+
+# transform exec arguments to the from expected by Redis::ScriptCache
+around exec => sub {
+    my ( $next, $self, $name, $keys, $args ) = @_;
+    my @keys = @{ $keys // [] };
+    my @args = @{ $args // [] };
+
+    $self->$next($name, [ 0+@keys, @keys, @args ]);
+};
 
 has _json_encoder => (
     is      => 'ro',

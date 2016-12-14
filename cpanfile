@@ -7,6 +7,7 @@ requires 'JSON::MaybeXS';
 requires 'List::Util';
 requires 'Moo';
 requires 'Redis';
+requires 'Redis::ScriptCache';
 requires 'Try::Tiny';
 requires 'namespace::clean';
 

@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -44,6 +44,7 @@
             "List::Util" : "0",
             "Moo" : "0",
             "Redis" : "0",
+            "Redis::ScriptCache" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.14.1"
@@ -69,6 +70,6 @@
       }
    },
    "version" : "0.0001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 
