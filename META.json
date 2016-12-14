@@ -44,7 +44,6 @@
             "List::Util" : "0",
             "Moo" : "0",
             "Redis" : "0",
-            "Redis::ScriptCache" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.14.1"
@@ -69,7 +68,7 @@
          "web" : "https://github.com/semifor/Redis-RateLimit"
       }
    },
-   "version" : "1.0000",
+   "version" : "1.0001",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 
