@@ -41,17 +41,16 @@
             "File::Share" : "0",
             "File::Slurp::Tiny" : "0",
             "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
             "Moo" : "0",
-            "POSIX" : "0",
-            "Perl6::Junction" : "0",
             "Redis" : "0",
+            "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.14.1"
          }
       },
       "test" : {
          "requires" : {
-            "Digest::SHA1" : "0",
             "Test::Mock::Time" : "0",
             "Test::Spec" : "0"
          }

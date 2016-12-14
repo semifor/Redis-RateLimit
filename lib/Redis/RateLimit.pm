@@ -8,8 +8,7 @@ use Digest::SHA1 qw/sha1_hex/;
 use File::Share qw/dist_file/;
 use File::Slurp::Tiny qw/read_file/;
 use JSON::MaybeXS;
-use Perl6::Junction qw/any/;
-use POSIX qw/fmax fmin/;
+use List::Util qw/any max min/;
 use Redis;
 use Redis::Evalsha;
 use namespace::clean;
@@ -172,7 +171,7 @@ sub _script_args {
     croak "Bad keys: @$keys" unless @adjusted_keys;
 
     my $rules = $self->json_encode($self->rules);
-    $weight = fmax($weight, 1);
+    $weight = max($weight, 1);
     return (
         \@adjusted_keys,
         [ $rules, time, $weight, $self->_whitelist_key, $self->_blacklist_key ],
@@ -192,7 +191,7 @@ sub check {
     ( $keys, my $args ) = $self->_script_args($keys);
 
     my $result = $self->exec(check_rate_limit => $keys, $args);
-    return $result == any(_DENIED_NUMS);
+    return any { $result == $_ } _DENIED_NUMS;
 }
 
 =method incr($key | \@keys [, $weight ])
@@ -209,7 +208,7 @@ sub incr {
     ( $keys, my $args ) = $self->_script_args($keys, $weight);
 
     my $result = $self->exec(check_limit_incr => $keys, $args);
-    return $result == any(_DENIED_NUMS);
+    return any { $result == $_ } _DENIED_NUMS;
 }
 
 =method keys
@@ -245,7 +244,7 @@ sub violated_rules {
             # Note: this mirrors precision computation in `check_limit.lua`
             # on lines 7 and 8 and count key construction on line 16
             my ( $interval, $limit, $precision ) = @$rule;
-            $precision = fmin($precision // $interval, $interval);
+            $precision = min($precision // $interval, $interval);
             my $count_key = "$interval:$precision:";
 
             my $count = $self->redis_hget($self->_prefix_key($key), $count_key);
