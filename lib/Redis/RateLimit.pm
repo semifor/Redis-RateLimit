@@ -15,7 +15,7 @@ use namespace::clean;
 
 =attr redis
 
-Redis client. If non is provided, a default is constructed for 127.0.0.1:6379.
+Redis client. If none is provided, a default is constructed for 127.0.0.1:6379.
 
 =cut
 
@@ -180,7 +180,7 @@ sub _script_args {
 
 =method check($key | \@keys)
 
-Returns true if any of the keys is rate limited.
+Returns true if any of the keys are rate limited.
 
 =cut
 
@@ -407,6 +407,7 @@ goodness.
 See this excellent articles on how the sliding window rate limiting with Redis
 works:
 
+=for :list
 * L<Introduction to Rate Limiting with Redis Part
   1|http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html>
 * L<Introduction to Rate Limiting with Redis Part

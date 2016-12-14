@@ -64,10 +64,8 @@ goodness.
 See this excellent articles on how the sliding window rate limiting with Redis
 works:
 
-\* [Introduction to Rate Limiting with Redis Part
-  1](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html)
-\* [Introduction to Rate Limiting with Redis Part
-  2](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html)
+- [Introduction to Rate Limiting with Redis Part 1](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html)
+- [Introduction to Rate Limiting with Redis Part 2](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html)
 
 For more information on the \`weight\` and \`precision\` options, see the second
 blog post above.
@@ -80,7 +78,7 @@ blog post above.
 
 ## redis
 
-Redis client. If non is provided, a default is constructed for 127.0.0.1:6379.
+Redis client. If none is provided, a default is constructed for 127.0.0.1:6379.
 
 ## prefix
 
@@ -101,7 +99,7 @@ and optionally `precision` values.
 
 ## check($key | \\@keys)
 
-Returns true if any of the keys is rate limited.
+Returns true if any of the keys are rate limited.
 
 ## incr($key | \\@keys \[, $weight \])
 
