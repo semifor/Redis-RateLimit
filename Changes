@@ -1,0 +1,5 @@
+Revision history for Redis-RateLimit
+
+{{$NEXT}}
+  - ported ratelimit.js to Redis::RateLimit
+  - ported shavaluator-js to Redis::Evalsha

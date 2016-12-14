@@ -1,0 +1,11 @@
+language: perl
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+services:
+  - redis-server
+env:
+  - TEST_REDIS_RATELIMIT_SERVER=127.0.0.1:6379
