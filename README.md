@@ -10,7 +10,7 @@ Redis::RateLimit - Sliding window rate limiting with Redis
 
 # VERSION
 
-version 1.0001
+version 1.0002
 
 # SYNOPSIS
 
