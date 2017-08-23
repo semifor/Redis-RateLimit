@@ -6,7 +6,7 @@ use Moo;
 use Carp;
 use Digest::SHA1 qw/sha1_hex/;
 use File::Share qw/dist_file/;
-use File::Slurp::Tiny qw/read_file/;
+use File::Slurper qw/read_text/;
 use JSON::MaybeXS;
 use List::Util qw/any max min/;
 use Redis;
@@ -110,7 +110,7 @@ sub _read_lua {
     my ( $self, $filename ) = @_;
 
     my $path = dist_file('Redis-RateLimit', "$filename.lua");
-    read_file($path, binmode => ':utf8');
+    read_text($path);
 }
 
 sub _check_limit_script {
