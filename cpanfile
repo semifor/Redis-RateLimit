@@ -4,7 +4,7 @@ requires 'Digest::SHA1';
 requires 'File::Share';
 requires 'File::Slurp::Tiny';
 requires 'JSON::MaybeXS';
-requires 'List::Util';
+requires 'List::Util' => '1.33';
 requires 'Moo';
 requires 'Redis';
 requires 'Try::Tiny';
